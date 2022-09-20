@@ -31,8 +31,26 @@ class StrongSORT(object):
                  mc_lambda=0.995,
                  ema_alpha=0.9
                 ):
+        
+        #self.model = ReIDDetectMultiBackend(weights=model_weights, device=device, fp16=fp16)
+        # model_name = get_model_name(model_weights)
+        # model_url = get_model_url(model_weights)
 
-        self.model = ReIDDetectMultiBackend(weights=model_weights, device=device, fp16=fp16)
+        # if not file_exists(model_weights) and model_url is not None:
+        #     gdown.download(model_url, str(model_weights), quiet=False)
+        # elif file_exists(model_weights):
+        #     pass
+        # elif model_url is None:
+        #     print('No URL associated to the chosen DeepSort weights. Choose between:')
+        #     show_downloadeable_models()
+        #     exit()
+        model_name='osnet_x0_25'
+        self.extractor = FeatureExtractor(
+            # get rid of dataset information DeepSort model name
+            model_name=model_name,
+            model_path=model_weights,
+            device=str(device)
+        )
         
         self.max_dist = max_dist
         metric = NearestNeighborDistanceMetric(
@@ -128,7 +146,7 @@ class StrongSORT(object):
             im = ori_img[y1:y2, x1:x2]
             im_crops.append(im)
         if im_crops:
-            features = self.model(im_crops)
+            features = self.extractor(im_crops)
         else:
             features = np.array([])
         return features
